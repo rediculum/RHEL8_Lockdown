@@ -243,7 +243,7 @@ line_num=$(grep -n "^[[:space:]]*umask" /etc/profile | head -1 | cut -d: -f1)
 sed -i ${line_num}s/002/027/ /etc/profile
 
 echo "Set History Timestamp for all users..."
-grep -q "HISTTIMEFORMAT=" /etc/profile || echo "export HISTTIMEFORMAT=\"%d.%m.%y %T\"" >> /etc/profile
+grep -q "HISTTIMEFORMAT=" /etc/profile || echo "export HISTTIMEFORMAT=\"%d.%m.%y %T  \"" >> /etc/profile
 
 echo "Set History size..."
 sed -i -E 's/^HISTSIZE.*/HISTSIZE=10000/g' /etc/profile
