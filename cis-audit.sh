@@ -1141,7 +1141,7 @@ function main {
   echo "== CIS 2.2.1.2 Ensure chrony is configured"
   func_wrapper ntp_cfg
   echo "== CIS 2.2.2 Ensure X Window System not installed"
-  func_wrapper rpm_not_installed xorg-x11*
+  func_wrapper rpm_not_installed xorg-x11-server-common
   echo "== CIS 2.2.3-17 Ensure unused services not enabled"
   func_wrapper check_svc_not_enabled rsyncd
   func_wrapper check_svc_not_enabled avahi-daemon
