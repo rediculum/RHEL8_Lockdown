@@ -61,6 +61,18 @@ ISSUE='/etc/issue'
 ISSUE_NET='/etc/issue.net'
 BANNER_MSG='/etc/dconf/db/gdm.d/01-banner-message'
 
+function echo_bold {
+  echo -e "\e[1m${@} \e[0m"
+}
+
+function echo_red {
+  echo -e "\e[91m${@} \e[0m"
+}
+
+function echo_green {
+  echo -e "\e[92m${@} \e[0m"
+}
+
 function separate_partition {
   # Test that the supplied $1 is a separate partition
 
@@ -1004,17 +1016,18 @@ function func_wrapper {
   func_name=$1
   shift
   args=$@
-  ${func_name} ${args}
+  printf "${func_name} ${args}: "
+  ${func_name} ${args} >/dev/null 2>&1
   if [[ "$?" -eq 0 ]]; then
-    echo ${func_name} ${args} OK
+    echo_green OK
   else
-    echo ${func_name} ${args} ERROR
+    echo_red ERROR
   fi
 }
 
 
 function main {
-  echo "== CIS 1.1.1 Disable unused file systems"
+  echo_bold "== CIS 1.1.1 Disable unused file systems"
   func_wrapper test_disable_mounting cramfs
   func_wrapper test_disable_mounting vfat
   func_wrapper test_disable_mounting squashfs
@@ -1024,125 +1037,125 @@ function main {
   func_wrapper test_disable_mounting hfs
   func_wrapper test_disable_mounting hfsplus
 
-  echo "== CIS 1.1.2 Ensure separate /tmp exists"
+  echo_bold "== CIS 1.1.2 Ensure separate /tmp exists"
   func_wrapper separate_partition /tmp
-  echo "== CIS 1.1.3 Ensure nodev option set on /tmp"
+  echo_bold "== CIS 1.1.3 Ensure nodev option set on /tmp"
   func_wrapper mount_option /tmp nodev
-  echo "== CIS 1.1.4 Ensure nosuid option set on /tmp"
+  echo_bold "== CIS 1.1.4 Ensure nosuid option set on /tmp"
   func_wrapper mount_option /tmp nosuid
-  echo "== CIS 1.1.5 Ensure noexec option set on /tmp"
+  echo_bold "== CIS 1.1.5 Ensure noexec option set on /tmp"
   func_wrapper mount_option /tmp noexec
-  echo "== CIS 1.1.6 Ensure separate /var exists"
+  echo_bold "== CIS 1.1.6 Ensure separate /var exists"
   func_wrapper separate_partition /var
-  echo "== CIS 1.1.7 Ensure separate /var/tmp exists"
+  echo_bold "== CIS 1.1.7 Ensure separate /var/tmp exists"
   func_wrapper bind_mounted_to /var/tmp /tmp
-  echo "== CIS 1.1.8 Ensure nodev option set on /var/tmp"
+  echo_bold "== CIS 1.1.8 Ensure nodev option set on /var/tmp"
   func_wrapper mount_option /var/tmp nodev
-  echo "== CIS 1.1.9 Ensure nosuid option set on /var/tmp"
+  echo_bold "== CIS 1.1.9 Ensure nosuid option set on /var/tmp"
   func_wrapper mount_option /var/tmp nosuid
-  echo "== CIS 1.1.10 Ensure noexec option set on /var/tmp"
+  echo_bold "== CIS 1.1.10 Ensure noexec option set on /var/tmp"
   func_wrapper mount_option /var/tmp noexec
-  echo "== CIS 1.1.11 Ensure separate /var/log exists"
+  echo_bold "== CIS 1.1.11 Ensure separate /var/log exists"
   func_wrapper separate_partition /var/log
-  echo "== CIS 1.1.12 Ensure separate /var/log/audit exists"
+  echo_bold "== CIS 1.1.12 Ensure separate /var/log/audit exists"
   func_wrapper separate_partition /var/log/audit
-  echo "== CIS 1.1.13 Ensure separate /home exists"
+  echo_bold "== CIS 1.1.13 Ensure separate /home exists"
   func_wrapper separate_partition /home
-  echo "== CIS 1.1.14 Ensure nodev option set on /home"
+  echo_bold "== CIS 1.1.14 Ensure nodev option set on /home"
   func_wrapper mount_option /home nodev
-  echo "== CIS 1.1.15 Ensure nodev option set on /dev/shm"
+  echo_bold "== CIS 1.1.15 Ensure nodev option set on /dev/shm"
   func_wrapper mount_option /dev/shm nodev
-  echo "== CIS 1.1.16 Ensure nosuid option set on /dev/shm"
+  echo_bold "== CIS 1.1.16 Ensure nosuid option set on /dev/shm"
   func_wrapper mount_option /dev/shm nosuid
-  echo "== CIS 1.1.17 Ensure noexec option set on /dev/shm"
+  echo_bold "== CIS 1.1.17 Ensure noexec option set on /dev/shm"
   func_wrapper mount_option /dev/shm noexec
-  echo "== CIS 1.1.21 Ensure sticky bit set on all world-writeable dirs"
+  echo_bold "== CIS 1.1.21 Ensure sticky bit set on all world-writeable dirs"
   func_wrapper sticky_wrld_w_dirs 
-  echo "== CIS 1.1.22 Disable Automounting"
+  echo_bold "== CIS 1.1.22 Disable Automounting"
   func_wrapper check_svc_not_enabled autofs
-  echo "== CIS 1.1.23 Disable USB Storage"
+  echo_bold "== CIS 1.1.23 Disable USB Storage"
   func_wrapper test_disable_mounting usb-storage
 
   if [[ $ID == "rhel" ]]; then
-    echo "== CIS 1.2.1 Red Hat Subscription is configured"
+    echo_bold "== CIS 1.2.1 Red Hat Subscription is configured"
     func_wrapper redhat_subscription
-    echo "== CIS 1.2.2 Disable rhnsd Daemon"
+    echo_bold "== CIS 1.2.2 Disable rhnsd Daemon"
     func_wrapper check_svc_not_enabled rhnsd
   fi
 
-  echo "== CIS 1.2.3 GPG keys are configured"
+  echo_bold "== CIS 1.2.3 GPG keys are configured"
   func_wrapper gpg_key_installed
-  echo "== CIS 1.2.4 gpgcheck is globally activated"
+  echo_bold "== CIS 1.2.4 gpgcheck is globally activated"
   func_wrapper yum_gpgcheck
-  echo "== CIS 1.2.5 Ensure repos are configured"
+  echo_bold "== CIS 1.2.5 Ensure repos are configured"
   func_wrapper yum_update
 
-  echo "== CIS 1.3.1 Ensure sudo is installd"
+  echo_bold "== CIS 1.3.1 Ensure sudo is installd"
   func_wrapper rpm_installed sudo
-  echo "== CIS 1.3.2 Ensure pty is set in sudoers"
-  echo "== CIS 1.3.3 Ensure logfile is set in sudoers"
+  echo_bold "== CIS 1.3.2 Ensure pty is set in sudoers"
+  echo_bold "== CIS 1.3.3 Ensure logfile is set in sudoers"
   
-  echo "== CIS 1.4.1 Ensure AIDE is installed"
+  echo_bold "== CIS 1.4.1 Ensure AIDE is installed"
   func_wrapper rpm_installed aide
-  echo "== CIS 1.4.1 Ensure AIDE is scheduled"
+  echo_bold "== CIS 1.4.1 Ensure AIDE is scheduled"
   func_wrapper verify_aide_cron
 
-  echo "== CIS 1.5.1 Ensure permissions on bootloader config"
+  echo_bold "== CIS 1.5.1 Ensure permissions on bootloader config"
   func_wrapper check_grub_perms
-  echo "== CIS 1.5.2 Ensure bootloader password"
+  echo_bold "== CIS 1.5.2 Ensure bootloader password"
   func_wrapper check_boot_pass
-  echo "== CIS 1.5.3 Ensure auth for single user mode"
+  echo_bold "== CIS 1.5.3 Ensure auth for single user mode"
 
-  echo "== CIS 1.6.1 Ensure core dumps restricted"
+  echo_bold "== CIS 1.6.1 Ensure core dumps restricted"
   func_wrapper restrict_core_dumps 
-  echo "== CIS 1.6.2 Ensure ASLR enabled"
+  echo_bold "== CIS 1.6.2 Ensure ASLR enabled"
   func_wrapper chk_sysctl kernel.randomize_va_space 2
 
-  echo "== CIS 1.7.1.1 Ensure SELinux is installed"
+  echo_bold "== CIS 1.7.1.1 Ensure SELinux is installed"
   func_wrapper rpm_installed libselinux
-  echo "== CIS 1.7.1.2 Ensure SELinux is not disabled in grub"
+  echo_bold "== CIS 1.7.1.2 Ensure SELinux is not disabled in grub"
   func_wrapper verify_selinux_grubcfg
-  echo "== CIS 1.7.1.3 Ensure SELinux policy configured"
+  echo_bold "== CIS 1.7.1.3 Ensure SELinux policy configured"
   func_wrapper verify_selinux_policy
-  echo "== CIS 1.7.1.4 Ensure SELinux is enforced"
+  echo_bold "== CIS 1.7.1.4 Ensure SELinux is enforced"
   func_wrapper verify_selinux_state
-  echo "== CIS 1.7.1.5 Ensure no unconfined services"
+  echo_bold "== CIS 1.7.1.5 Ensure no unconfined services"
   func_wrapper unconfined_procs
-  echo "== CIS 1.7.1.6 Ensure SETroubleshoot not installed"
+  echo_bold "== CIS 1.7.1.6 Ensure SETroubleshoot not installed"
   func_wrapper rpm_not_installed setroubleshoot 
-  echo "== CIS 1.7.1.7 Ensure MCS Translation Service not installed"
+  echo_bold "== CIS 1.7.1.7 Ensure MCS Translation Service not installed"
   func_wrapper rpm_not_installed mcstrans
 
   #func_wrapper check_root_owns ${GRUB_CFG}
 
-  echo "== CIS 1.8.1.1-3 Ensure banners are configured"
+  echo_bold "== CIS 1.8.1.1-3 Ensure banners are configured"
   func_wrapper warning_banners
 
-  echo "== CIS 1.8.1.4-6 Ensure banners have permissions set"
+  echo_bold "== CIS 1.8.1.4-6 Ensure banners have permissions set"
   for file in ${MOTD} ${ISSUE} ${ISSUE_NET} ; do
     func_wrapper check_root_owns "${file}"
     func_wrapper check_file_perms "${file}" 644 
   done
 
-  echo "== CIS 1.8.2 Ensure GDM login banner is configured"
+  echo_bold "== CIS 1.8.2 Ensure GDM login banner is configured"
   func_wrapper gnome_banner
 
-  echo "== CIS 1.9 Ensure updates, patches and sec software installed"
+  echo_bold "== CIS 1.9 Ensure updates, patches and sec software installed"
   func_wrapper yum_update
 
-  echo "== CIS 1.10 Ensure system-wide crypto policy is not legacy (TODO)"
-  echo "== CIS 1.11 Ensure system-wide crypto policy is FUTURE or FIPS (TODO)"
+  echo_bold "== CIS 1.10 Ensure system-wide crypto policy is not legacy (TODO)"
+  echo_bold "== CIS 1.11 Ensure system-wide crypto policy is FUTURE or FIPS (TODO)"
 
-  echo "== CIS 2.1.1 Ensure xinetd not installed"
+  echo_bold "== CIS 2.1.1 Ensure xinetd not installed"
   func_wrapper rpm_not_installed xinetd
 
-  echo "== CIS 2.2.1.1 Ensure time sync is in use"
+  echo_bold "== CIS 2.2.1.1 Ensure time sync is in use"
   func_wrapper rpm_installed chrony
-  echo "== CIS 2.2.1.2 Ensure chrony is configured"
+  echo_bold "== CIS 2.2.1.2 Ensure chrony is configured"
   func_wrapper ntp_cfg
-  echo "== CIS 2.2.2 Ensure X Window System not installed"
+  echo_bold "== CIS 2.2.2 Ensure X Window System not installed"
   func_wrapper rpm_not_installed xorg-x11-server-common
-  echo "== CIS 2.2.3-17 Ensure unused services not enabled"
+  echo_bold "== CIS 2.2.3-17 Ensure unused services not enabled"
   func_wrapper check_svc_not_enabled rsyncd
   func_wrapper check_svc_not_enabled avahi-daemon
   func_wrapper check_svc_not_enabled snmpd
@@ -1159,9 +1172,9 @@ function main {
   func_wrapper check_svc_not_enabled cups
   func_wrapper check_svc_not_enabled ypserv
 
-  echo "== CIS 2.2.18 Ensure MTA is configured local-only (TODO)"
+  echo_bold "== CIS 2.2.18 Ensure MTA is configured local-only (TODO)"
 
-  echo "== CIS 2.3.1-3 Ensure unused services not installed"
+  echo_bold "== CIS 2.3.1-3 Ensure unused services not installed"
   func_wrapper rpm_not_installed ypbind
   func_wrapper rpm_not_installed telnet
   func_wrapper rpm_not_installed openldap-clients
@@ -1169,82 +1182,82 @@ function main {
   #func_wrapper check_umask 
   #func_wrapper check_def_tgt
 
-  echo "== CIS 3.1.1 Ensure IP forwarding disabled"
+  echo_bold "== CIS 3.1.1 Ensure IP forwarding disabled"
   func_wrapper chk_sysctl net.ipv4.ip_forward 0
-  echo "== CIS 3.1.2 Ensure packet redirect sending disabled"
+  echo_bold "== CIS 3.1.2 Ensure packet redirect sending disabled"
   func_wrapper chk_sysctl net.ipv4.conf.all.send_redirects 0
   func_wrapper chk_sysctl net.ipv4.conf.default.send_redirects 0
 
-  echo "== CIS 3.2.1 Ensure packet redirect sending disabled"
+  echo_bold "== CIS 3.2.1 Ensure packet redirect sending disabled"
   func_wrapper chk_sysctl net.ipv4.conf.all.accept_source_route 0
   func_wrapper chk_sysctl net.ipv4.conf.default.accept_source_route 0
 
-  echo "== CIS 3.2.2 Ensure ICMP redirects not accepted"
+  echo_bold "== CIS 3.2.2 Ensure ICMP redirects not accepted"
   func_wrapper chk_sysctl net.ipv4.conf.all.accept_redirects 0
   func_wrapper chk_sysctl net.ipv4.conf.default.accept_redirects 0
 
-  echo "== CIS 3.2.3 Ensure secure ICMP redirects not accepted"
+  echo_bold "== CIS 3.2.3 Ensure secure ICMP redirects not accepted"
   func_wrapper chk_sysctl net.ipv4.conf.all.secure_redirects 0
   func_wrapper chk_sysctl net.ipv4.conf.default.secure_redirects 0
 
-  echo "== CIS 3.2.4 Ensure suspicious packets are logged"
+  echo_bold "== CIS 3.2.4 Ensure suspicious packets are logged"
   func_wrapper chk_sysctl net.ipv4.conf.all.log_martians 1
   func_wrapper chk_sysctl net.ipv4.conf.default.log_martians 1
 
-  echo "== CIS 3.2.5 Ensure broadcast ICMP requests ignored"
-  func_wrapper chk_sysctl net.ipv4.icmp_echo_ignore_broadcasts 1
+  echo_bold "== CIS 3.2.5 Ensure broadcast ICMP requests ignored"
+  func_wrapper chk_sysctl net.ipv4.icmp_echo_bold_ignore_broadcasts 1
 
-  echo "== CIS 3.2.6 Ensure bogus ICMP responses ignored"
+  echo_bold "== CIS 3.2.6 Ensure bogus ICMP responses ignored"
   func_wrapper chk_sysctl net.ipv4.icmp_ignore_bogus_error_responses 1
 
-  echo "== CIS 3.2.7 Ensure reverse path filtering enabled"
+  echo_bold "== CIS 3.2.7 Ensure reverse path filtering enabled"
   func_wrapper chk_sysctl net.ipv4.conf.all.rp_filter 1
   func_wrapper chk_sysctl net.ipv4.conf.default.rp_filter 1
 
-  echo "== CIS 3.2.8 Ensure TCP SYN Cookies enabled"
+  echo_bold "== CIS 3.2.8 Ensure TCP SYN Cookies enabled"
   func_wrapper chk_sysctl net.ipv4.tcp_syncookies 1
 
-  echo "== CIS 3.2.9 Ensure IPv6 router advert. not accepted"
+  echo_bold "== CIS 3.2.9 Ensure IPv6 router advert. not accepted"
   func_wrapper ip6_router_advertisements_dis
   func_wrapper ip6_redirect_accept_dis
 
-  echo "== CIS 3.3.1-4 Ensure DCCP, SCTP, RDS and TIPC disabld"
+  echo_bold "== CIS 3.3.1-4 Ensure DCCP, SCTP, RDS and TIPC disabld"
   func_wrapper chk_cis_cnf dccp ${CIS_CNF}
   func_wrapper chk_cis_cnf sctp ${CIS_CNF}
   func_wrapper chk_cis_cnf rds ${CIS_CNF}
   func_wrapper chk_cis_cnf tipc ${CIS_CNF}
 
-  echo "== CIS 3.4.1.1 Ensure a Firwall package installed"
+  echo_bold "== CIS 3.4.1.1 Ensure a Firwall package installed"
   func_wrapper check_svc_enabled firewalld  
-  echo "== CIS 3.4.2.1 Ensure firwall service enabled and running" 
+  echo_bold "== CIS 3.4.2.1 Ensure firwall service enabled and running" 
   func_wrapper check_svc_enabled firewalld
-  echo "== CIS 3.4.2.2 Ensure iptables service not enabled" 
+  echo_bold "== CIS 3.4.2.2 Ensure iptables service not enabled" 
   func_wrapper check_svc_not_enabled iptables
-  echo "== CIS 3.4.2.3 Ensure nftables service not enabled" 
+  echo_bold "== CIS 3.4.2.3 Ensure nftables service not enabled" 
   func_wrapper check_svc_not_enabled nftables
-  echo "== CIS 3.4.2.4 - 3.4.4.2.4 not checked since iptables and nftables disabled" 
+  echo_bold "== CIS 3.4.2.4 - 3.4.4.2.4 not checked since iptables and nftables disabled" 
 
-  echo "== CIS 3.5 Ensure WLAN disabled" 
+  echo_bold "== CIS 3.5 Ensure WLAN disabled" 
   func_wrapper wlan_iface_disabled
 
-  echo "== CIS 3.6 Disable IPv6" 
+  echo_bold "== CIS 3.6 Disable IPv6" 
   func_wrapper chk_sysctl net.ipv6.conf.all.disable_ipv6 1
 
-  echo "== CIS 4.1.1.1 Ensure auditd installed" 
+  echo_bold "== CIS 4.1.1.1 Ensure auditd installed" 
   func_wrapper rpm_installed audit
-  echo "== CIS 4.1.1.2 Ensure auditd is enabled" 
+  echo_bold "== CIS 4.1.1.2 Ensure auditd is enabled" 
   func_wrapper check_svc_enabled auditd
-  echo "== CIS 4.1.1.3 Ensure auditing procs start prior auditd enabled" 
+  echo_bold "== CIS 4.1.1.3 Ensure auditing procs start prior auditd enabled" 
   func_wrapper audit_procs_prior_2_auditd
-  echo "== CIS 4.1.1.4 Ensure audit_backlog_limit is sufficient" 
+  echo_bold "== CIS 4.1.1.4 Ensure audit_backlog_limit is sufficient" 
   func_wrapper audit_backlog_limits
-  echo "== CIS 4.1.2.1 Ensure audit log storage size configured" 
+  echo_bold "== CIS 4.1.2.1 Ensure audit log storage size configured" 
   func_wrapper audit_log_storage_size
-  echo "== CIS 4.1.2.2 Ensure audit logs are not autom. deleted" 
+  echo_bold "== CIS 4.1.2.2 Ensure audit logs are not autom. deleted" 
   func_wrapper keep_all_audit_info
-  echo "== CIS 4.1.2.3 Ensure system is dis. when logs are full" 
+  echo_bold "== CIS 4.1.2.3 Ensure system is dis. when logs are full" 
   func_wrapper dis_on_audit_log_full
-  echo "== CIS 4.1.3-17 Ensure events are collected" 
+  echo_bold "== CIS 4.1.3-17 Ensure events are collected" 
   func_wrapper coll_chg2_sysadm_scope
   func_wrapper audit_logins_logouts
   func_wrapper audit_session_init
@@ -1261,48 +1274,48 @@ function main {
   func_wrapper coll_sysadm_actions 
   func_wrapper audit_cfg_immut
 
-  echo "== CIS 4.2.1.1 Ensure rsyslog installed" 
+  echo_bold "== CIS 4.2.1.1 Ensure rsyslog installed" 
   func_wrapper rpm_installed rsyslog
-  echo "== CIS 4.2.1.2 Ensure rsyslog enabled" 
+  echo_bold "== CIS 4.2.1.2 Ensure rsyslog enabled" 
   func_wrapper check_svc_enabled rsyslog
-  echo "== CIS 4.2.1.3 Ensure rsyslog default file creation perms configured (TODO)" 
-  echo "== CIS 4.2.1.4 Ensure logging is configured (TODO)"
+  echo_bold "== CIS 4.2.1.3 Ensure rsyslog default file creation perms configured (TODO)" 
+  echo_bold "== CIS 4.2.1.4 Ensure logging is configured (TODO)"
   func_wrapper chk_file_exists ${RSYSLOG_CNF}
-  echo "== CIS 4.2.1.5 Ensure rsyslog is configured to send to remote host"
+  echo_bold "== CIS 4.2.1.5 Ensure rsyslog is configured to send to remote host"
   func_wrapper chk_rsyslog_remote_host 
-  echo "== CIS 4.2.1.6 Ensure remote rsyslog messages only accepted on design. log hosts (TODO)"
-  echo "== CIS 4.2.2.1 Ensure journald configured to send logs to rsyslog (TODO)"
-  echo "== CIS 4.2.2.2 Ensure journald configured to compress large logs (TODO)"
-  echo "== CIS 4.2.2.3 Ensure journald configured to write logs to persist. disk (TODO)"
+  echo_bold "== CIS 4.2.1.6 Ensure remote rsyslog messages only accepted on design. log hosts (TODO)"
+  echo_bold "== CIS 4.2.2.1 Ensure journald configured to send logs to rsyslog (TODO)"
+  echo_bold "== CIS 4.2.2.2 Ensure journald configured to compress large logs (TODO)"
+  echo_bold "== CIS 4.2.2.3 Ensure journald configured to write logs to persist. disk (TODO)"
 
-  echo "== CIS 4.2.3 Ensure perms on all logs configured (TODO)"
+  echo_bold "== CIS 4.2.3 Ensure perms on all logs configured (TODO)"
 
-  echo "== CIS 4.3 Ensure logrotate is configured"
+  echo_bold "== CIS 4.3 Ensure logrotate is configured"
   func_wrapper logrotate_cfg
 
-  echo "== CIS 5.1.1 Ensure cron daemon is enabled"
+  echo_bold "== CIS 5.1.1 Ensure cron daemon is enabled"
   func_wrapper check_svc_enabled crond
 
-  echo "== CIS 5.1.2-7 Ensure perms for crontab files"
+  echo_bold "== CIS 5.1.2-7 Ensure perms for crontab files"
   for file in ${ANACRONTAB} ${CRONTAB} ${CRON_HOURLY} ${CRON_DAILY} ${CRON_WEEKLY} ${CRON_MONTHLY} ; do
     func_wrapper check_root_owns "${file}"
     func_wrapper check_file_perms "${file}" 600 
   done
   func_wrapper check_file_perms "${CRON_DIR}" 700
 
-  echo "== CIS 5.1.8 Ensure at/cron is restricted to auth. users"
+  echo_bold "== CIS 5.1.8 Ensure at/cron is restricted to auth. users"
   func_wrapper at_cron_auth_users
 
-  echo "== CIS 5.2.1 Ensure perms on sshd_config"
+  echo_bold "== CIS 5.2.1 Ensure perms on sshd_config"
   func_wrapper check_file_perms "${SSHD_CFG}" 600 
   func_wrapper check_root_owns "${SSHD_CFG}"
 
-  echo "== CIS 5.2.2 Ensure SSH access is limited to users/groups"
+  echo_bold "== CIS 5.2.2 Ensure SSH access is limited to users/groups"
   func_wrapper ssh_user_group_access
   
-  echo "== CIS 5.2.3 Ensure perms on SSH private host key files (TODO)"
-  echo "== CIS 5.2.4 Ensure perms on SSH public host key files (TODO)"
-  echo "== CIS 5.2.5-20 Ensure SSH options are set properly"
+  echo_bold "== CIS 5.2.3 Ensure perms on SSH private host key files (TODO)"
+  echo_bold "== CIS 5.2.4 Ensure perms on SSH public host key files (TODO)"
+  echo_bold "== CIS 5.2.5-20 Ensure SSH options are set properly"
   func_wrapper chk_param "${SSHD_CFG}" LogLevel INFO
   func_wrapper chk_param "${SSHD_CFG}" X11Forwarding no
   func_wrapper ssh_maxauthtries 4
@@ -1321,41 +1334,41 @@ function main {
   func_wrapper chk_param "${SSHD_CFG}" Ciphers aes128-ctr,aes192-ctr,aes256-ctr
   func_wrapper chk_param "${SSHD_CFG}" Banner /etc/issue.net
 
-  echo "== CIS 5.3.1 Ensure custom authselect profile (TODO)"
-  echo "== CIS 5.3.2 Ensure authselect profile (TODO)"
-  echo "== CIS 5.3.3 Ensure authselect includes faillock"
+  echo_bold "== CIS 5.3.1 Ensure custom authselect profile (TODO)"
+  echo_bold "== CIS 5.3.2 Ensure authselect profile (TODO)"
+  echo_bold "== CIS 5.3.3 Ensure authselect includes faillock"
   func_wrapper failed_pass_lock
-  echo "== CIS 5.4.1 Ensure password creation req. configured"
+  echo_bold "== CIS 5.4.1 Ensure password creation req. configured"
   func_wrapper pass_req_params 
-  echo "== CIS 5.4.2 Ensure lockout for failed password attempts (TODO)"
-  echo "== CIS 5.4.3 Ensure password reuse is limited"
+  echo_bold "== CIS 5.4.2 Ensure lockout for failed password attempts (TODO)"
+  echo_bold "== CIS 5.4.3 Ensure password reuse is limited"
   func_wrapper remember_passwd 
-  echo "== CIS 5.4.4 Ensure password hashing algo is SH512"
+  echo_bold "== CIS 5.4.4 Ensure password hashing algo is SH512"
   func_wrapper pass_hash_algo sha512
 
-  echo "== CIS 5.5.1.1-3 Ensure password expiration"
+  echo_bold "== CIS 5.5.1.1-3 Ensure password expiration"
   func_wrapper chk_param "${LOGIN_DEFS}" PASS_MAX_DAYS 90
   func_wrapper chk_param "${LOGIN_DEFS}" PASS_MIN_DAYS 7
   func_wrapper chk_param "${LOGIN_DEFS}" PASS_WARN_AGE 7
 
-  echo "== CIS 5.5.1.4 Ensure inactive password lock 30 days"
+  echo_bold "== CIS 5.5.1.4 Ensure inactive password lock 30 days"
   func_wrapper inactive_usr_acs_locked
-  echo "== CIS 5.5.1.5 Ensure all users last pwd change date is in past (TODO)"
-  echo "== CIS 5.5.2 Ensure sys accounts are secured"
+  echo_bold "== CIS 5.5.1.5 Ensure all users last pwd change date is in past (TODO)"
+  echo_bold "== CIS 5.5.2 Ensure sys accounts are secured"
   func_wrapper dis_sys_accs
-  echo "== CIS 5.5.3 Ensure shell timeout is 900 (TODO)"
-  echo "== CIS 5.5.4 Ensure default group for root is GID 0"
+  echo_bold "== CIS 5.5.3 Ensure shell timeout is 900 (TODO)"
+  echo_bold "== CIS 5.5.4 Ensure default group for root is GID 0"
   func_wrapper root_def_grp
-  echo "== CIS 5.5.5 Ensure default user umask 027"
+  echo_bold "== CIS 5.5.5 Ensure default user umask 027"
   func_wrapper def_umask_for_users 
 
-  echo "== CIS 5.6 Ensure root login restrict to system console (TODO)"
+  echo_bold "== CIS 5.6 Ensure root login restrict to system console (TODO)"
 
-  echo "== CIS 5.7 Ensure acces to su command restricted"
+  echo_bold "== CIS 5.7 Ensure acces to su command restricted"
   func_wrapper su_access
 
-  echo "== CIS 6.1.1 Audit system file perms (TODO)"
-  echo "== CIS 6.1.2-9 Ensure perms on passwd, group and shadow files"
+  echo_bold "== CIS 6.1.1 Audit system file perms (TODO)"
+  echo_bold "== CIS 6.1.2-9 Ensure perms on passwd, group and shadow files"
   func_wrapper check_file_perms "${PASSWD}" 644 
   func_wrapper check_file_perms "${SHADOW}" 0
   func_wrapper check_file_perms "${GSHADOW}" 0 
@@ -1364,69 +1377,69 @@ function main {
     func_wrapper check_root_owns "${file}"
   done
 
-  echo "== CIS 6.1.10 Ensure no world writable files exist"
+  echo_bold "== CIS 6.1.10 Ensure no world writable files exist"
   func_wrapper world_w_dirs
   
-  echo "== CIS 6.1.11 Ensure no unowned files exist"
+  echo_bold "== CIS 6.1.11 Ensure no unowned files exist"
   func_wrapper unowned_files
 
-  echo "== CIS 6.1.12 Ensure no ungrouped files exist"
+  echo_bold "== CIS 6.1.12 Ensure no ungrouped files exist"
   func_wrapper ungrouped_files
 
-  echo "== CIS 6.1.13 Audit SUID executables"
+  echo_bold "== CIS 6.1.13 Audit SUID executables"
   func_wrapper suid_exes
-  echo "== CIS 6.1.13 Audit SGID executables"
+  echo_bold "== CIS 6.1.13 Audit SGID executables"
   func_wrapper sgid_exes
 
-  echo "== CIS 6.2.1 Ensure password fields not empty"
+  echo_bold "== CIS 6.2.1 Ensure password fields not empty"
   func_wrapper passwd_field_chk
 
-  echo "== CIS 6.2.2,4,5 Ensure no legacy entries in passwd, shadow and group"
+  echo_bold "== CIS 6.2.2,4,5 Ensure no legacy entries in passwd, shadow and group"
   func_wrapper nis_in_file ${PASSWD}
   func_wrapper nis_in_file ${SHADOW}
   func_wrapper nis_in_file ${GROUP}
 
-  echo "== CIS 6.2.3 Ensure root PATH integrity"
+  echo_bold "== CIS 6.2.3 Ensure root PATH integrity"
   func_wrapper root_path
 
-  echo "== CIS 6.2.6 Ensure root only uid0"
+  echo_bold "== CIS 6.2.6 Ensure root only uid0"
   func_wrapper no_uid0_other_root
 
-  echo "== CIS 6.2.7 Ensure users home dirs resticted"
+  echo_bold "== CIS 6.2.7 Ensure users home dirs resticted"
   func_wrapper home_dir_perms
 
-  echo "== CIS 6.2.8 Ensure users home dirs owned"
+  echo_bold "== CIS 6.2.8 Ensure users home dirs owned"
   func_wrapper chk_home_dirs_owns
 
-  echo "== CIS 6.2.9 Ensure users dot files not group/world writeable"
+  echo_bold "== CIS 6.2.9 Ensure users dot files not group/world writeable"
   func_wrapper dot_file_perms
 
-  echo "== CIS 6.2.10,11,13 Ensure users not have .forward .rhosts files"
+  echo_bold "== CIS 6.2.10,11,13 Ensure users not have .forward .rhosts files"
   func_wrapper user_dot_forward 
   func_wrapper user_dot_netrc 
   func_wrapper dot_rhosts_files
 
-  echo "== CIS 6.2.12 Ensure users .netrc perms"
+  echo_bold "== CIS 6.2.12 Ensure users .netrc perms"
   func_wrapper dot_netrc_perms
   
-  echo "== CIS 6.2.14 Ensure group in passwd exist in group"
+  echo_bold "== CIS 6.2.14 Ensure group in passwd exist in group"
   func_wrapper chk_groups_passwd
 
-  echo "== CIS 6.2.15 Ensure no duplicate UIDs"
+  echo_bold "== CIS 6.2.15 Ensure no duplicate UIDs"
   func_wrapper duplicate_uids
 
-  echo "== CIS 6.2.16 Ensure no duplicate GIDs"
+  echo_bold "== CIS 6.2.16 Ensure no duplicate GIDs"
   func_wrapper duplicate_gids
 
-  echo "== CIS 6.2.17 Ensure no duplicate user names"
+  echo_bold "== CIS 6.2.17 Ensure no duplicate user names"
   func_wrapper duplicate_usernames
 
-  echo "== CIS 6.2.18 Ensure no duplicate group names"
+  echo_bold "== CIS 6.2.18 Ensure no duplicate group names"
   func_wrapper duplicate_groupnames
 
-  echo "== CIS 6.2.19 Ensure shadow group is empty (TODO)"
+  echo_bold "== CIS 6.2.19 Ensure shadow group is empty (TODO)"
 
-  echo "== CIS 6.2.20 Ensure all users home dir exist"
+  echo_bold "== CIS 6.2.20 Ensure all users home dir exist"
   func_wrapper chk_home_dirs_exist
 }
 
