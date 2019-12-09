@@ -60,6 +60,7 @@ MOTD='/etc/motd'
 ISSUE='/etc/issue'
 ISSUE_NET='/etc/issue.net'
 BANNER_MSG='/etc/dconf/db/gdm.d/01-banner-message'
+TOTAL=0; PASS=0; FAILED=0
 
 function echo_bold {
   echo -e "\e[1m${@} \e[0m"
@@ -1013,14 +1014,17 @@ function wlan_iface_disabled {
 }
 
 function func_wrapper {
+  let TOTAL++
   func_name=$1
   shift
   args=$@
   printf "${func_name} ${args}: "
   ${func_name} ${args} >/dev/null 2>&1
   if [[ "$?" -eq 0 ]]; then
+    let PASS++
     echo_green OK
   else
+    let FAILED++
     echo_red ERROR
   fi
 }
@@ -1443,4 +1447,12 @@ function main {
   func_wrapper chk_home_dirs_exist
 }
 
+function summary {
+  # SUMUP
+  echo "==============================================================="
+  echo ""
+  echo "Total $TOTAL checks: $PASS passed / $FAILED failed ($(expr $FAILED \* 100 / $TOTAL)%)"
+}
+
 main
+summary
