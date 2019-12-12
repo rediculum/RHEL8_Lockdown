@@ -585,6 +585,9 @@ authselect select sssd >/dev/null
 authselect enable-feature with-faillock >/dev/null
 authselect apply-changes >/dev/null
 
+echo "Set Crypto Policy to FUTURE"
+update-crypto-policies --set FUTURE >/dev/null
+
 echo "Restricting Access to the su Command..."
 cp /etc/pam.d/su $AUDITDIR/su_$TIME.bak
 pam_su='/etc/pam.d/su'
@@ -592,7 +595,7 @@ line_num="$(grep -n "^\#auth[[:space:]]*required[[:space:]]*pam_wheel.so[[:space
 sed -i "${line_num} a auth		required	pam_wheel.so use_uid" ${pam_su}
 
 echo "Add root to group wheel..."
-gpasswd -a root wheel
+gpasswd -a root wheel >/dev/null
 
 echo ""
 echo "Successfully Completed"
