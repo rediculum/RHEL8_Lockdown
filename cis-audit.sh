@@ -1300,7 +1300,7 @@ function main {
   echo_bold "== CIS 4.2.1.2 Ensure rsyslog enabled" 
   func_wrapper check_svc_enabled rsyslog
   echo_bold "== CIS 4.2.1.3 Ensure rsyslog default file creation perms configured (TODO)" 
-  echo_bold "== CIS 4.2.1.4 Ensure logging is configured (TODO)"
+  echo_bold "== CIS 4.2.1.4 Ensure logging is configured"
   func_wrapper chk_file_exists ${RSYSLOG_CNF}
   echo_bold "== CIS 4.2.1.5 Ensure rsyslog is configured to send to remote host"
   func_wrapper chk_rsyslog_remote_host 
