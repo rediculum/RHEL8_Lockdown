@@ -22,6 +22,7 @@ GRUB_CFG='/boot/grub2/grub.cfg'
 GRUB_DIR='/etc/grub.d'
 SELINUX_CFG='/etc/selinux/config'
 NTP_CONF='/etc/ntp.conf'
+SECURETTY_CFG='/etc/securetty'
 SYSCON_NTPD='/etc/sysconfig/ntpd'
 LIMITS_CNF='/etc/security/limits.conf'
 SYSCTL_CNF='/etc/sysctl.d/99-CIS.conf'
@@ -318,6 +319,11 @@ function ip6_redirect_accept_dis {
 function chk_file_exists {
   local file="$1"
   [[ -f "${file}" ]] || return
+}
+
+function chk_file_not_exists {
+  local file="$1"
+  [[ -f "${file}" ]] && return 1 || return 0
 }
  
 function chk_hosts_deny_content {
@@ -1366,7 +1372,8 @@ function main {
   echo_bold "== CIS 5.5.5 Ensure default user umask 027"
   func_wrapper def_umask_for_users 
 
-  echo_bold "== CIS 5.6 Ensure root login restrict to system console (TODO)"
+  echo_bold "== CIS 5.6 Ensure root login restrict to system console"
+  func_wrapper chk_file_not_exists "${SECURETTY_CFG}"
 
   echo_bold "== CIS 5.7 Ensure acces to su command restricted"
   func_wrapper su_access
