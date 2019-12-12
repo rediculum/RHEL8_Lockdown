@@ -1019,6 +1019,10 @@ function wlan_iface_disabled {
   nmcli -c no -m multiline radio all |grep -v "\-HW" |grep -q enabled && return 1 || return 0
 }
 
+function chk_cryptopolicy_not_legacy {
+  egrep -qi '^\s*LEGACY\s*(\s+#.*)?$' /etc/crypto-policies/config && return 1 || return 0
+}
+
 function func_wrapper {
   let TOTAL++
   func_name=$1
@@ -1153,7 +1157,9 @@ function main {
   echo_bold "== CIS 1.9 Ensure updates, patches and sec software installed"
   func_wrapper yum_update
 
-  echo_bold "== CIS 1.10 Ensure system-wide crypto policy is not legacy (TODO)"
+  echo_bold "== CIS 1.10 Ensure system-wide crypto policy is not legacy"
+  func_wrapper chk_cryptopolicy_not_legacy
+
   echo_bold "== CIS 1.11 Ensure system-wide crypto policy is FUTURE or FIPS (TODO)"
 
   echo_bold "== CIS 2.1.1 Ensure xinetd not installed"
