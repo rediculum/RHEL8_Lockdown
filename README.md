@@ -15,8 +15,6 @@ Use any material from this repository at your own risk.
 ## TODO
 Following checks in cis-audit.sh still pending:
 
-CIS 1.10 Ensure system-wide crypto policy is not legacy (TODO)"  
-CIS 1.11 Ensure system-wide crypto policy is FUTURE or FIPS (TODO)"  
 CIS 2.2.18 Ensure MTA is configured local-only (TODO)"  
 CIS 4.2.1.3 Ensure rsyslog default file creation perms configured (TODO)"   
 CIS 4.2.1.4 Ensure logging is configured (TODO)"  
