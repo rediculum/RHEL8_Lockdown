@@ -17,7 +17,6 @@ Following checks in cis-audit.sh still pending:
 
 CIS 2.2.18 Ensure MTA is configured local-only (TODO)"  
 CIS 4.2.1.3 Ensure rsyslog default file creation perms configured (TODO)"   
-CIS 4.2.1.4 Ensure logging is configured (TODO)"  
 CIS 4.2.1.6 Ensure remote rsyslog messages only accepted on design. log hosts (TODO)"  
 CIS 4.2.2.1 Ensure journald configured to send logs to rsyslog (TODO)"  
 CIS 4.2.2.2 Ensure journald configured to compress large logs (TODO)"  
