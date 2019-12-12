@@ -21,6 +21,7 @@ YUM_CONF='/etc/yum.conf'
 GRUB_CFG='/boot/grub2/grub.cfg'
 GRUB_DIR='/etc/grub.d'
 SELINUX_CFG='/etc/selinux/config'
+JOURNALD_CFG='/etc/systemd/journald.conf'
 NTP_CONF='/etc/ntp.conf'
 SECURETTY_CFG='/etc/securetty'
 SYSCON_NTPD='/etc/sysconfig/ntpd'
@@ -1305,9 +1306,12 @@ function main {
   echo_bold "== CIS 4.2.1.5 Ensure rsyslog is configured to send to remote host"
   func_wrapper chk_rsyslog_remote_host 
   echo_bold "== CIS 4.2.1.6 Ensure remote rsyslog messages only accepted on design. log hosts (TODO)"
-  echo_bold "== CIS 4.2.2.1 Ensure journald configured to send logs to rsyslog (TODO)"
-  echo_bold "== CIS 4.2.2.2 Ensure journald configured to compress large logs (TODO)"
-  echo_bold "== CIS 4.2.2.3 Ensure journald configured to write logs to persist. disk (TODO)"
+  echo_bold "== CIS 4.2.2.1 Ensure journald configured to send logs to rsyslog"
+  func_wrapper chk_param "${JOURNALD_CFG}" "ForwardToSyslog=yes"
+  echo_bold "== CIS 4.2.2.2 Ensure journald configured to compress large logs"
+  func_wrapper chk_param "${JOURNALD_CFG}" "Compress=yes"
+  echo_bold "== CIS 4.2.2.3 Ensure journald configured to write logs to persist. disk"
+  func_wrapper chk_param "${JOURNALD_CFG}" "Storage=persistent"
 
   echo_bold "== CIS 4.2.3 Ensure perms on all logs configured (TODO)"
 
