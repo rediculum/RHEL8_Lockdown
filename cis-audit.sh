@@ -22,9 +22,8 @@ GRUB_CFG='/boot/grub2/grub.cfg'
 GRUB_DIR='/etc/grub.d'
 SELINUX_CFG='/etc/selinux/config'
 JOURNALD_CFG='/etc/systemd/journald.conf'
-NTP_CONF='/etc/ntp.conf'
+CHRONY_CONF='/etc/chrony.conf'
 SECURETTY_CFG='/etc/securetty'
-SYSCON_NTPD='/etc/sysconfig/ntpd'
 LIMITS_CNF='/etc/security/limits.conf'
 SYSCTL_CNF='/etc/sysctl.d/99-CIS.conf'
 HOSTS_ALLOW='/etc/hosts.allow'
@@ -238,16 +237,8 @@ function check_svc_enabled {
   systemctl is-enabled "${service}" | grep -q 'enabled' && return
 }
 
-function ntp_cfg {
-  cut -d\# -f1 ${NTP_CONF} | egrep "restrict{1}[[:space:]]+default{1}" ${NTP_CONF} | grep kod \
-| grep nomodify | grep notrap | grep nopeer | grep -q noquery || return
-
-  cut -d\# -f1 ${NTP_CONF} | egrep "restrict{1}[[:space:]]+\-6{1}[[:space:]]+default" | grep kod \
-| grep nomodify | grep notrap | grep nopeer | grep -q noquery || return
-
-  cut -d\# -f1 ${NTP_CONF} | egrep -q "^[[:space:]]*server" || return
-
-  cut -d\# -f1 ${SYSCON_NTPD} | grep "OPTIONS=" | grep -q "ntp:ntp" || return
+function chrony_cfg {
+   egrep -q "^(server|pool)" ${CHRONY_CONF} || return
 }
 
 function restrict_core_dumps {
@@ -1174,7 +1165,7 @@ function main {
   echo_bold "== CIS 2.2.1.1 Ensure time sync is in use"
   func_wrapper rpm_installed chrony
   echo_bold "== CIS 2.2.1.2 Ensure chrony is configured"
-  func_wrapper ntp_cfg
+  func_wrapper chrony_cfg
   echo_bold "== CIS 2.2.2 Ensure X Window System not installed"
   func_wrapper rpm_not_installed xorg-x11-server-common
   echo_bold "== CIS 2.2.3-17 Ensure unused services not enabled"
