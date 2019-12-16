@@ -597,7 +597,8 @@ function chk_param {
   local file="${1}" 
   local parameter="${2}" 
   local value="${3}" 
-  cut -d\# -f1 ${file} | egrep -q "^${parameter}[[:space:]]+${value}" || return
+  [[ -z ${3} ]] && spacer="" || spacer="[[:space:]]"
+  cut -d\# -f1 ${file} | egrep -q "^${parameter}${spacer}${value}" || return
 }
 
 
