@@ -60,9 +60,24 @@ for i in \
   [[ `grep -q "^$i" /etc/security/pwquality.conf` ]] && continue
   option=${i%%=*}
   if [[ `grep -q "${option}" /etc/security/pwquality.conf` ]]; then
-    sed -i "s/.*$option.*/$i/g" /etc/security/pwquality.conf
+    sed -i "s/.*${option}.*/$i/g" /etc/security/pwquality.conf
   else
     echo "${i}" >> /etc/security/pwquality.conf
+  fi
+done
+
+echo "Setting journald configuration"
+for i in \
+"Compress=yes" \
+"ForwardToSyslog=yes" \
+"Storage=peristent" \
+; do
+  [[ `grep -q "^$i" /etc/systemd/journald.conf` ]] && continue
+  option=${i%%=*}
+  if [[ `grep "${option}" /etc/systemd/journald.conf` ]]; then
+    sed -i "s/.*${option}.*/$i/g" /etc/systemd/journald.conf
+  else
+    echo "${i}" >> /etc/systemd/journald.conf
   fi
 done
 
@@ -228,7 +243,7 @@ for i in \
 ; do
   [[ `egrep -q "^${i}" /etc/ssh/sshd_config` ]] && continue
   option=${i%% *}
-  grep -q $option /etc/ssh/sshd_config && sed -i "s/.*$option.*/$i/g" /etc/ssh/sshd_config || echo "$i" >> /etc/ssh/sshd_config
+  grep -q ${option} /etc/ssh/sshd_config && sed -i "s/.*${option}.*/$i/g" /etc/ssh/sshd_config || echo "$i" >> /etc/ssh/sshd_config
 done
 
 chown root:root /etc/ssh/sshd_config
@@ -259,7 +274,7 @@ for i in \
 ; do
   [[ `egrep "^${i}" /etc/login.defs` ]] && continue
   option=${i%% *}
-  grep -q $option /etc/login.defs && sed -i "s/.*$option.*/$i/g" /etc/login.defs || echo "$i" >> /etc/login.defs
+  grep -q ${option} /etc/login.defs && sed -i "s/.*${option}.*/$i/g" /etc/login.defs || echo "$i" >> /etc/login.defs
 done
 
 echo "Verifying System File Permissions..."
