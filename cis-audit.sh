@@ -1020,6 +1020,12 @@ function chk_cryptopolicy_future_fips {
   egrep -qi '^\s*(FUTURE|FIPS)\s*(\s+#.*)?$' /etc/crypto-policies/config || return
 }
 
+function chk_owner_group {
+  local file=$1
+  local owner_group=$2
+  stat -c '%U:%G' $1 |grep -q "$2" || return
+}
+
 function func_wrapper {
   let TOTAL++
   func_name=$1
@@ -1330,8 +1336,18 @@ function main {
   echo_bold "== CIS 5.2.2 Ensure SSH access is limited to users/groups"
   func_wrapper ssh_user_group_access
   
-  echo_bold "== CIS 5.2.3 Ensure perms on SSH private host key files (TODO)"
-  echo_bold "== CIS 5.2.4 Ensure perms on SSH public host key files (TODO)"
+  echo_bold "== CIS 5.2.3 Ensure perms on SSH private host key files"
+  for hostkey in /etc/ssh/ssh_host_*_key; do
+    func_wrapper chk_owner_group "${hostkey}" "root:ssh_keys"
+    func_wrapper check_file_perms "${hostkey}" 640
+  done
+
+  echo_bold "== CIS 5.2.4 Ensure perms on SSH public host key files"
+  for pubhostkey in /etc/ssh/ssh_host_*_key.pub; do
+    func_wrapper chk_owner_group "${pubhostkey}" "root:root"
+    func_wrapper check_file_perms "${pubhostkey}" 644
+  done
+
   echo_bold "== CIS 5.2.5-20 Ensure SSH options are set properly"
   func_wrapper chk_param "${SSHD_CFG}" LogLevel INFO
   func_wrapper chk_param "${SSHD_CFG}" X11Forwarding no
