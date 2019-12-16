@@ -70,7 +70,7 @@ echo "Setting journald configuration"
 for i in \
 "Compress=yes" \
 "ForwardToSyslog=yes" \
-"Storage=peristent" \
+"Storage=persistent" \
 ; do
   [[ `grep -q "^$i" /etc/systemd/journald.conf` ]] && continue
   option=${i%%=*}
