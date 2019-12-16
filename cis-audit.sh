@@ -1099,7 +1099,6 @@ function main {
     echo_bold "== CIS 1.2.2 Disable rhnsd Daemon"
     func_wrapper check_svc_not_enabled rhnsd
   fi
-
   echo_bold "== CIS 1.2.3 GPG keys are configured"
   func_wrapper gpg_key_installed
   echo_bold "== CIS 1.2.4 gpgcheck is globally activated"
@@ -1109,9 +1108,9 @@ function main {
 
   echo_bold "== CIS 1.3.1 Ensure sudo is installd"
   func_wrapper rpm_installed sudo
-  echo_bold "== CIS 1.3.2 Ensure pty is set in sudoers"
-  echo_bold "== CIS 1.3.3 Ensure logfile is set in sudoers"
-  
+  echo_bold "== CIS 1.3.2 Ensure pty is set in sudoers (TODO)"
+  echo_bold "== CIS 1.3.3 Ensure logfile is set in sudoers (TODO)"
+
   echo_bold "== CIS 1.4.1 Ensure AIDE is installed"
   func_wrapper rpm_installed aide
   echo_bold "== CIS 1.4.1 Ensure AIDE is scheduled"
@@ -1121,7 +1120,7 @@ function main {
   func_wrapper check_grub_perms
   echo_bold "== CIS 1.5.2 Ensure bootloader password"
   func_wrapper check_boot_pass
-  echo_bold "== CIS 1.5.3 Ensure auth for single user mode"
+  echo_bold "== CIS 1.5.3 Ensure auth for single user mode (TODO)"
 
   echo_bold "== CIS 1.6.1 Ensure core dumps restricted"
   func_wrapper restrict_core_dumps 
@@ -1142,18 +1141,15 @@ function main {
   func_wrapper rpm_not_installed setroubleshoot 
   echo_bold "== CIS 1.7.1.7 Ensure MCS Translation Service not installed"
   func_wrapper rpm_not_installed mcstrans
-
   #func_wrapper check_root_owns ${GRUB_CFG}
 
   echo_bold "== CIS 1.8.1.1-3 Ensure banners are configured"
   func_wrapper warning_banners
-
   echo_bold "== CIS 1.8.1.4-6 Ensure banners have permissions set"
   for file in ${MOTD} ${ISSUE} ${ISSUE_NET} ; do
     func_wrapper check_root_owns "${file}"
     func_wrapper check_file_perms "${file}" 644 
   done
-
   echo_bold "== CIS 1.8.2 Ensure GDM login banner is configured"
   func_wrapper gnome_banner
 
@@ -1191,7 +1187,6 @@ function main {
   func_wrapper check_svc_not_enabled dhcpd
   func_wrapper check_svc_not_enabled cups
   func_wrapper check_svc_not_enabled ypserv
-
   echo_bold "== CIS 2.2.18 Ensure MTA is configured local-only (TODO)"
 
   echo_bold "== CIS 2.3.1-3 Ensure unused services not installed"
