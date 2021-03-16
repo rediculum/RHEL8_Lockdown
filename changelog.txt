@@ -1,0 +1,14 @@
+In this version, I added checks to eliminate the following
+three errors:
+
+1. chmod: cannot access '/boot/grub2/grub.cfg': No such file or directory
+   Apparently, grub.cfg doesn't exist if your on an EFI
+   system rather than a BIOS system
+
+2. chmod: missing operand after ‘a+t’
+   I received this error while the script was checking
+   for the sticky bit on world-writable directories.
+   I didn't have any world-writable directories.
+
+3. grep: /etc/modprobe.d/ipv6.conf: No such file or directory
+   ipv6.conf didn't exist

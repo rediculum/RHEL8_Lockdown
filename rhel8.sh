@@ -282,7 +282,10 @@ chmod 644 /etc/passwd
 chmod 000 /etc/shadow
 chmod 000 /etc/gshadow
 chmod 644 /etc/group
-chmod 600 /boot/grub2/grub.cfg
+# grub.cfg won't exist on an EFI system
+if [ -f /boot/grub2/grub.cfg ]; then
+	chmod 600 /boot/grub2/grub.cfg
+fi
 chmod 600 /etc/rsyslog.conf
 chown root:root /etc/passwd
 chown root:root /etc/shadow
@@ -290,7 +293,7 @@ chown root:root /etc/gshadow
 chown root:root /etc/group
 
 echo "Setting Sticky Bit on All World-Writable Directories..."
-df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d \( -perm -0002 -a ! -perm -1000 \) 2>/dev/null | xargs chmod a+t >> $AUDITDIR/sticky_on_world_$TIME.log
+df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d \( -perm -0002 -a ! -perm -1000 \) 2>/dev/null | xargs -r chmod a+t >> $AUDITDIR/sticky_on_world_$TIME.log
 
 echo "Searching for world writable files..."
 df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -0002 >> $AUDITDIR/world_writable_files_$TIME.log
@@ -591,7 +594,7 @@ cp /etc/sysconfig/network $AUDITDIR/network_$TIME.bak
 for i in "NETWORKING_IPV6=no" "IPV6INIT=no"; do
   [[ `egrep -q "^$i" /etc/sysconfig/network` ]] || echo "$i" >> /etc/sysconfig/network
 done
-[[ `egrep -q "options ipv6 disable=1" /etc/modprobe.d/ipv6.conf` ]] || echo "options ipv6 disable=1" >> /etc/modprobe.d/ipv6.conf
+[ -f /etc/modprobe.d/ipv6.conf ] && `egrep -q "options ipv6 disable=1" /etc/modprobe.d/ipv6.conf` || echo "options ipv6 disable=1" >> /etc/modprobe.d/ipv6.conf
 
 echo "Disabling WLAN interfaces..."
 nmcli radio all off
